@@ -1,0 +1,43 @@
+ISSUE TRACKING:
+  - HTML modals blurry on some displays using low resolution, CSS translation issue when centering modal causes pixel shifting?
+  - Split settings into smaller functions now that async is available on load
+
+
+
+FEATURES TO ADD:
+  - New enrollment packet pdf form for technology use/Google permission
+  
+
+BUG FIXES/FEATURES ADDED:
+  MASSIVE UPDATE! 3.0 + 3.1
+  
+  - USER SETTINGS:
+    - Update from localStorage to userProperties allowing user settings to persist across all devices as the settings are now tied to the user's Google account and preventing XSS/data escaping sandbox:
+    - doGet has been rewritten to inject userSettings into HTML on page load
+    - HTML pages for dashboard/settings have script injection added for userProperties in the <head>
+    - falcon-themes.lib and falcon-sounds.lib have been rewritten, setSound() is no longer used, see saveSound()
+    - function updates in dashboard.js and settings.js where localStorage was being used now access global
+      USER_SETTINGS
+    - New function getUserProperties() to get user properties from properties store, returns user properties
+    - Updated function writeSettings(see required arguments) to write user properties to store
+  
+  - FILE HANDLING:
+    - Data export now saves locally instead of to Google Drive (.csv and .xlsx supported)
+    - PDFMake update from version 0.2.10 to 0.2.12
+    - Forms updated and now generate as native PDFs using PDFMake for downloading directly to client
+    - Mail attachments now consolidate forms into a single PDF file instead of 5 separate attachments
+
+  - UI CHANGES:
+    - Dropdown CSS and menus added to toolbar to declutter UI/group similar tools
+    - UI modernization updates
+    - Toasts no longer display above HTML modals
+  
+  - GENERAL CHANGES:
+    - Page loading optimized for large databases
+    - Clean up showError('duplicateStudent') and showError ('duplicateDatabaseEntry'). Consolidated student error to database error
+    - Many functions updated for optimization/changed for consistency, removed old/redundant code
+    - Failed payment options removed from settings/forms
+
+  - BUG FIXES:
+    - Improved UI responsiveness during PDF generation with async/await and timeout
+    - Prevent deletion of select box selection in data export modal
