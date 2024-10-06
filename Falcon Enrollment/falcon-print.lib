@@ -1,0 +1,318 @@
+<!-- FALCON PRINT LIBRARY v1.0 -->
+<!--
+  Usage: 
+    - Format printed page automatically when using the print dialog in the browser (@media print).
+-->
+
+<!-- CSS -->
+<style>
+  @media print {
+    .menu-bar
+    .menu-button,
+    .menu-icon,
+    .nav-bar,
+    .tool-bar,
+    .toast-container,
+    .search-container,
+    #addStudentModal,
+    #emailModal,
+    #exportFormsModal,
+    #renameStudentModal,
+    #backupDataModal,
+    h2 {
+      display: none !important;
+    }
+
+    h1 {
+      font-size: 22px;
+      color: black;
+    }
+
+    h3 {
+      font-size: 18px;
+      color: black;
+      text-align: center;
+      margin: 10px 0 5px 0;
+    }
+
+    table {
+      font-size: 16px;
+      color: black;
+      margin-bottom: 0px;
+      border: none;
+      border-radius: none;
+    }
+
+    table td {
+      padding: 2px 0px 2px 5px;
+      border: none;
+    }
+
+    td:first-child {
+      width: 20%;
+      font-weight: bold;
+    }
+
+    table tr:first-child td:first-child {
+      border-top-left-radius: 0px;
+    }
+
+    table tr:first-child td:last-child {
+      border-top-right-radius: 0px;
+    }
+
+    table tr:last-child td:first-child {
+      border-bottom-left-radius: 0px;
+    }
+
+    table tr:last-child td:last-child {
+      border-bottom-right-radius: 0px;
+    }
+
+    /* Highlight every other row with a light gray background */
+    table tr:nth-child(odd) {
+      -webkit-print-color-adjust: exact; /* Force color on print */
+      background-color: #e0e0e0 /* Gray 300 */;
+    }
+  }
+</style>
+
+<div class="print-content" style="display: none" id="printDashboard">
+  <table>
+    <tr>
+      <td>Student name:</td>
+      <td id="studentNameOutput"></td>
+    </tr>
+    <tr>
+      <td>Gender:</td>
+      <td id="genderOutput"></td>
+    </tr>
+    <tr>
+      <td>Date of birth:</td>
+      <td id="dateOfBirthOutput"></td>
+    </tr>
+    <tr>
+      <td>Incoming grade level:</td>
+      <td id="incomingGradeLevelOutput"></td>
+    </tr>
+    <tr>
+      <td>Grade level status:</td>
+      <td id="gradeLevelStatusOutput"></td>
+    </tr>
+    <tr>
+      <td>Enrollment manager:</td>
+      <td id="enrollmentManagerOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Parent/guardian name:</td>
+      <td id="parentGuardianNameOutput"></td>
+    </tr>
+    <tr>
+      <td>Parent/guardian phone:</td>
+      <td id="parentGuardianPhoneOutput"></td>
+    </tr>
+    <tr>
+      <td>Parent/guardian email:</td>
+      <td id="parentGuardianEmailOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Current school name:</td>
+      <td id="currentSchoolNameOutput"></td>
+    </tr>
+    <tr>
+      <td>Current teacher name:</td>
+      <td id="currentTeacherNameOutput"></td>
+    </tr>
+    <tr>
+      <td>Current teacher email:</td>
+      <td id="currentTeacherEmailOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Enrolled in EEC:</td>
+      <td id="enrolledInEECOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Evaluation due date:</td>
+      <td id="evaluationDueDateOutput"></td>
+    </tr>
+    <tr>
+      <td>Evaluation email sent:</td>
+      <td id="evaluationEmailOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Student evaluation form:</td>
+      <td id="studentEvaluationFormOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Contacted to schedule:</td>
+      <td id="contactedToScheduleOutput"></td>
+    </tr>
+    <tr>
+      <td>Screening date:</td>
+      <td id="screeningDateOutput"></td>
+    </tr>
+    <tr>
+      <td>Screening time:</td>
+      <td id="screeningTimeOutput"></td>
+    </tr>
+    <td>Screening email sent:</td>
+    <td id="screeningEmailOutput"></td>
+ 
+    <tr>
+      <td>Report card:</td>
+      <td id="reportCardOutput"></td>
+    </tr>
+    <tr>
+      <td>IEP documentation:</td>
+      <td id="iepDocumentationOutput"></td>
+    </tr>
+    <tr>
+      <td>Screening fee:</td>
+      <td id="screeningFeeOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Admin submission date:</td>
+      <td id="adminSubmissionDateOutput"></td>
+    </tr>
+    <tr>
+      <td>Admin acceptance:</td>
+      <td id="adminAcceptanceOutput"></td>
+    </tr>
+    <tr>
+      <td>Acceptance due date:</td>
+      <td id="acceptanceDueDateOutput"></td>
+    </tr>
+    <tr>
+      <td>Acceptance email sent:</td>
+      <td id="acceptanceEmailOutput"></td>
+    </tr>
+    <tr>
+      <td>Family acceptance:</td>
+      <td id="familyAcceptanceOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Blackbaud account:</td>
+      <td id="blackbaudAccountOutput"></td>
+    </tr>
+    <tr>
+      <td>Birth certificate/passport:</td>
+      <td id="birthCertificatePassportOutput"></td>
+    </tr>
+    <tr>
+      <td>Immunization records:</td>
+      <td id="immunizationRecordsOutput"></td>
+    </tr>
+    <tr>
+      <td>Admission contract form:</td>
+      <td id="admissionContractFormOutput"></td>
+    </tr>
+    <tr>
+      <td>Tuition payment form:</td>
+      <td id="tuitionPaymentFormOutput"></td>
+    </tr>
+    <tr>
+      <td>Medical consent form:</td>
+      <td id="medicalConsentFormOutput"></td>
+    </tr>
+    <tr>
+      <td>Emergency contacts form:</td>
+      <td id="emergencyContactsFormOutput"></td>
+    </tr>
+    <tr>
+      <td>Registration fee:</td>
+      <td id="registrationFeeOutput"></td>
+    </tr>
+
+    <tr>
+      <td>Enrollment notes:</td>
+      <td id="enrollmentNotesOutput"></td>
+    </tr>
+  </table>
+</div>
+
+<!-- JAVASCRIPT FUNCTIONS -->
+<script type="text/javascript">
+
+  let mediaQueryList = window.matchMedia('print');
+  mediaQueryList.addListener(function(mql) {
+    if (mql.matches) {
+      beforePrintHandler();
+    } else {
+      afterPrintHandler();
+    }
+  });
+
+  function beforePrintHandler() {
+    getPrintData();
+    document.getElementById("page").style.display = "none";
+    document.getElementById("printDashboard").style.display = "block";
+  }
+
+  function afterPrintHandler() {
+    document.getElementById("printDashboard").style.display = "none";
+    document.getElementById("page").style.display = "flex";
+  }
+
+  function getPrintData() {
+    const elements = [
+      {input: 'studentName', output: 'studentNameOutput'},
+      {input: 'gender', output: 'genderOutput'},
+      {input: 'dateOfBirth', output: 'dateOfBirthOutput'},
+      {input: 'incomingGradeLevel', output: 'incomingGradeLevelOutput'},
+      {input: 'gradeLevelStatus', output: 'gradeLevelStatusOutput'},
+      {input: 'enrollmentManager', output: 'enrollmentManagerOutput'},
+      {input: 'parentGuardianName', output: 'parentGuardianNameOutput'},
+      {input: 'parentGuardianPhone', output: 'parentGuardianPhoneOutput'},
+      {input: 'parentGuardianEmail', output: 'parentGuardianEmailOutput'},
+      {input: 'currentSchoolName', output: 'currentSchoolNameOutput'},
+      {input: 'currentTeacherName', output: 'currentTeacherNameOutput'},
+      {input: 'currentTeacherEmail', output: 'currentTeacherEmailOutput'},
+      {input: 'enrolledInEEC', output: 'enrolledInEECOutput'},
+      {input: 'evaluationDueDate', output: 'evaluationDueDateOutput'},
+      {input: 'evaluationEmail', output: 'evaluationEmailOutput'},
+      {input: 'studentEvaluationForm', output: 'studentEvaluationFormOutput'},
+      {input: 'contactedToSchedule', output: 'contactedToScheduleOutput'},
+      {input: 'screeningDate', output: 'screeningDateOutput'},
+      {input: 'screeningTime', output: 'screeningTimeOutput'},
+      {input: 'screeningEmail', output: 'screeningEmailOutput'},
+      {input: 'reportCard', output: 'reportCardOutput'},
+      {input: 'iepDocumentation', output: 'iepDocumentationOutput'},
+      {input: 'screeningFee', output: 'screeningFeeOutput'},
+      {input: 'adminSubmissionDate', output: 'adminSubmissionDateOutput'},
+      {input: 'adminAcceptance', output: 'adminAcceptanceOutput'},
+      {input: 'acceptanceDueDate', output: 'acceptanceDueDateOutput'},
+      {input: 'acceptanceEmail', output: 'acceptanceEmailOutput'},
+      {input: 'familyAcceptance', output: 'familyAcceptanceOutput'},
+      {input: 'blackbaudAccount', output: 'blackbaudAccountOutput'},
+      {input: 'birthCertificatePassport', output: 'birthCertificatePassportOutput'},
+      {input: 'immunizationRecords', output: 'immunizationRecordsOutput'},
+      {input: 'admissionContractForm', output: 'admissionContractFormOutput'},
+      {input: 'tuitionPaymentForm', output: 'tuitionPaymentFormOutput'},
+      {input: 'medicalConsentForm', output: 'medicalConsentFormOutput'},
+      {input: 'emergencyContactsForm', output: 'emergencyContactsFormOutput'},
+      {input: 'registrationFee', output: 'registrationFeeOutput'},
+      {input: 'enrollmentNotes', output: 'enrollmentNotesOutput'}
+    ];
+
+    // Populate the print content
+    elements.forEach(element => {
+      const inputElement = document.getElementById(element.input);
+      const outputElement = document.getElementById(element.output);
+
+      if (element.input === 'enrollmentNotes') {
+        outputElement.textContent = inputElement.innerText;
+      } else {
+        outputElement.textContent = inputElement.value;
+      }
+    });
+  }
+  
+</script>
