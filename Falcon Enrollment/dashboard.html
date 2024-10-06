@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Falcon Enrollment</title>
+
+  <!-- Google Fonts: Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons v1.11.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- PDF Make v0.2.12 -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.js'></script>
+
+  <!-- Custom libraries -->
+  <?!= include('falcon-ui.lib'); ?>
+  <?!= include('falcon-themes.lib'); ?>
+  <?!= include('falcon-sounds.lib'); ?>
+  <?!= include('falcon-pdf.lib'); ?>
+
+  <!-- Import user settings from properties service -->
+  <script>
+    let USER_SETTINGS = JSON.parse('<?= userSettings ?>'); // Inject user settings
+  </script>
+</head>
+
+<body>
+  <div id="loading-indicator"></div>
+  <div id="modal-container"></div>
+
+  {{NAVBAR}}
+  <div class="tool-bar" id="toolbar">
+    <button class="tool-bar-button" id="saveChangesButton"><i class="bi bi-cloud-download"></i>Save</button>
+    <div class="dropdown">
+      <button class="dropdown-button" id="studentButton"><i class="bi bi-person-vcard"></i>Profile</button>
+      <div class="dropdown-content">
+        <button id="addStudentButton"><i class="bi bi-plus-circle"></i>Add student</button>
+        <button id="removeStudentButton"><i class="bi bi-dash-circle"></i>Remove student</button>
+        <button id="restoreStudentButton" style="display: none"><i class="bi bi-arrow-counterclockwise"></i>Restore student</button>
+        <button id="deleteStudentButton" style="display: none"><i class="bi bi-trash3"></i>Delete student</button>
+        <button id="renameStudentButton"><i class="bi bi-pencil"></i>Rename student</button>
+      </div>
+    </div>
+    <button class="tool-bar-button" id="emailButton"><i class="bi bi-envelope"></i>Email</button>
+    <div class="dropdown">
+      <button class="dropdown-button" id="exportButton"><i class="bi bi-box-arrow-up"></i>Export</button>
+      <div class="dropdown-content">
+        <button id="exportFormsButton"><i class="bi bi-file-earmark-text"></i>Forms</button>
+        <button id="exportDataButton"><i class="bi bi-database"></i>App data</button>
+      </div>
+    </div>
+    <button class="tool-bar-button" id="archiveButton"><i class="bi bi-archive"></i>Archive</button>
+    <button class="tool-bar-button" id="backButton" style="display: none"><i class="bi bi-arrow-left-circle"></i>Back</button>
+  </div>
+
+  <div id="toast-container"></div>
+  
+  <div class="column-container" id="page">
+    <!-- STUDENT INFORMATION COLUMN -->
+    <div class="column">
+      <div class="column-header">
+        <h2>Student Profile</h2>
+      </div>
+      <div class="column-body">
+        <h3>Profile Search</h3>
+        <div class="search-container" style="margin-top: 0; margin-bottom: 10px;">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" id="profileSearch" placeholder="Search...">
+        </div>
+        <h3>Student Information</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Student name:</td>
+              <td>
+                <select class="table-select" id="studentName"></select>
+              </td>
+            </tr>
+            <tr>
+              <td>Gender:</td>
+              <td>
+                <select class="table-select" id="gender">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Non-binary">Non-binary</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Date of birth:</td>
+              <td>
+                <input class="table-input" type="date" id="dateOfBirth">
+              </td>
+            </tr>
+            <tr>
+              <td>Incoming grade level:</td>
+              <td>
+                <select class="table-select" id="incomingGradeLevel">
+                  <option value="Transitional Kindergarten">Transitional Kindergarten</option>
+                  <option value="Kindergarten">Kindergarten</option>
+                  <option value="1st Grade">1st grade</option>
+                  <option value="2nd Grade">2nd grade</option>
+                  <option value="3rd Grade">3rd grade</option>
+                  <option value="4th Grade">4th grade</option>
+                  <option value="5th Grade">5th grade</option>
+                  <option value="6th Grade">6th grade</option>
+                  <option value="7th Grade">7th grade</option>
+                  <option value="8th Grade">8th grade</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Grade level status:</td>
+              <td>
+                <select class="table-select" id="gradeLevelStatus">
+                  <option value="Open">Open</option>
+                  <option value="Waitlist">Waitlist</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Enrollment manager:</td>
+              <td>
+                <select class="table-select" id="enrollmentManager"></select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <h3>Parent/Guardian Information</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Parent/guardian name:</td>
+              <td><input class="table-input" type="text" id="parentGuardianName"></td>
+            </tr>
+            <tr>
+              <td>Parent/guardian phone:</td>
+              <td><input class="table-input" type="text" id="parentGuardianPhone"></td>
+            </tr>
+            <tr>
+              <td>Parent/guardian email:</td>
+              <td><input class="table-input" type="text" id="parentGuardianEmail"></td>
+            </tr>
+          </table>
+        </div>
+        <h3>School/Teacher Information</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Current school name:</td>
+              <td>
+                <input class="table-input" type="text" id="currentSchoolName">
+              </td>
+            </tr>
+            <tr>
+              <td>Current teacher name:</td>
+              <td>
+                <input class="table-input" type="text" id="currentTeacherName">
+              </td>
+            </tr>
+            <tr>
+              <td>Current teacher email:</td>
+              <td>
+                <input class="table-input" type="text" id="currentTeacherEmail">
+              </td>
+            </tr>
+          </table>
+        </div>
+        <h3>EEC Information</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Enrolled in EEC:</td>
+              <td>
+                <select class="table-select" id="enrolledInEEC">
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENROLLMENT STATUS COLUMN -->
+    <div class="column">
+      <div class="column-header">
+        <h2>Student Enrollment Status</h2>
+      </div>
+      <div class="column-body">
+        <h3>Student Evaluation</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Evaluation due date:</td>
+              <td>
+                <input class="table-input" type="date" id="evaluationDueDate">
+              </td>
+            </tr>
+            <tr>
+              <td>Evaluation email sent:</td>
+              <td>
+                <select class="table-select" id="evaluationEmail">
+                <option value="Completed">Completed</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <h3>Student Evaluation Documents</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Student evaluation form:</td>
+              <td>
+                <select class="table-select" id="studentEvaluationForm">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <h3>Student Screening</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Contacted to schedule:</td>
+              <td>
+                <select class="table-select" id="contactedToSchedule">
+                  <option value="In Progress">In progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Screening date:</td>
+              <td>
+                <input class="table-input" type="date" id="screeningDate">
+              </td>
+            </tr>
+            <tr>
+              <td>Screening time:</td>
+              <td>
+                <input class="table-input" type="time" id="screeningTime">
+              </td>
+            </tr>
+            <td>Screening email sent:</td>
+            <td>
+              <select class="table-select" id="screeningEmail">
+                <option value="Completed">Completed</option>
+                <option value="N/A">N/A</option>
+              </select>
+            </td>
+          </table>
+        </div>
+        <h3>Student Screening Documents</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Report card:</td>
+              <td>
+                <select class="table-select" id="reportCard">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>IEP documentation:</td>
+              <td>
+                <select class="table-select" id="iepDocumentation">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Screening fee:</td>
+              <td>
+                <select class="table-select" id="screeningFee">
+                <option value="Requested">Requested</option>
+                <option value="Paid (EEC)">Paid (EEC)</option>
+                <option value="Paid (TK/K)">Paid (TK/K)</option>
+                <option value="Paid (1st-8th)">Paid (1st-8th)</option>
+                <option value="N/A">N/A</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <h3>Student Acceptance</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Admin submission date:</td>
+              <td>
+                <input class="table-input" type="date" id="adminSubmissionDate">
+              </td>
+            </tr>
+            <tr>
+              <td>Admin acceptance:</td>
+              <td>
+                <select class="table-select" id="adminAcceptance">
+                <option value="In Review">In review</option>
+                <option value="Accepted">Accepted</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Acceptance due date:</td>
+              <td>
+                <input class="table-input" type="date" id="acceptanceDueDate">
+              </td>
+            </tr>
+            <tr>
+              <td>Acceptance email sent:</td>
+              <td>
+                <select class="table-select" id="acceptanceEmail">
+                <option value="Completed">Completed</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Family acceptance:</td>
+              <td>
+                <select class="table-select" id="familyAcceptance">
+                <option value="Pending">Pending</option>
+                <option value="Accepted">Accepted</option>
+                <option value="Rejected">Rejected</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <h3>Student Acceptance Documents</h3>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <td>Blackbaud account:</td>
+              <td>
+                <select class="table-select" id="blackbaudAccount">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Birth certificate/passport:</td>
+              <td>
+                <select class="table-select" id="birthCertificatePassport">
+                  <option value="Requested">Requested</option>
+                  <option value="Received">Received</option>
+                  <option value="N/A">N/A</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Immunization records:</td>
+              <td>
+                <select class="table-select" id="immunizationRecords">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Admission contract form:</td>
+              <td>
+                <select class="table-select" id="admissionContractForm">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Tuition payment form:</td>
+              <td>
+                <select class="table-select" id="tuitionPaymentForm">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Medical consent form:</td>
+              <td>
+                <select class="table-select" id="medicalConsentForm">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Emergency contacts form:</td>
+              <td>
+                <select class="table-select" id="emergencyContactsForm">
+                <option value="Requested">Requested</option>
+                <option value="Received">Received</option>
+                <option value="N/A">N/A</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Registration fee:</td>
+              <td>
+                <select class="table-select" id="registrationFee">
+                <option value="Requested">Requested</option>
+                <option value="Paid">Paid</option>
+                <option value="N/A">N/A</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADDITIONAL NOTES COLUMN -->
+    <div class="column">
+      <div class="column-header">
+        <h2>Additional Information</h2>
+      </div>
+      <div class="column-body">
+        <h3>Enrollment Notes</h3>
+        <div class="rich-text-box" contenteditable="true" id="enrollmentNotes"></div>
+      </div>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- ADD STUDENT MODAL -->
+    <div class="modal-html" id="addStudentModal">
+      <div class="modal-htmlcontent">
+        <div class="modal-htmlheader">
+          <h2>Add Student
+            <button class="modal-htmlclose"><i class="bi-close bi-x-circle-fill"></i></button>
+          </h2>
+        </div>
+        <div class="modal-htmlbody">
+          <h3>Basic Information</h3>
+          <div class="table-wrapper">
+            <table>
+              <tr>
+                <td>Student first name:</td>
+                <td><input class="table-input" type="text" id="addFirstName"></select></td>
+              </tr>
+              <tr>
+                <td>Student last name:</td>
+                <td><input class="table-input" type="text" id="addLastName"></select></td>
+              </tr>
+              <tr>
+                <td>Gender:</td>
+                <td>
+                  <select class="table-select" id="addGender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Non-binary">Non-binary</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Date of birth:</td>
+                <td><input class="table-input" type="date" id="addDateOfBirth"></td>
+              </tr>
+              <tr>
+                <td>Incoming grade level:</td>
+                <td>
+                  <select class="table-select" id="addIncomingGradeLevel">
+                    <option value="Transitional Kindergarten">Transitional Kindergarten</option>
+                    <option value="Kindergarten">Kindergarten</option>
+                    <option value="1st Grade">1st grade</option>
+                    <option value="2nd Grade">2nd grade</option>
+                    <option value="3rd Grade">3rd grade</option>
+                    <option value="4th Grade">4th grade</option>
+                    <option value="5th Grade">5th grade</option>
+                    <option value="6th Grade">6th grade</option>
+                    <option value="7th Grade">7th grade</option>
+                    <option value="8th Grade">8th grade</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Grade level status:</td>
+                <td>
+                  <select class="table-select" id="addGradeLevelStatus">
+                    <option value="Open">Open</option>
+                    <option value="Waitlist">Waitlist</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Enrollment manager:</td>
+                <td><select class="table-select" id="addEnrollmentManager"></select></td>
+              </tr>
+            </table>
+          </div>
+          <h3>Parent/Guardian Information</h3>
+          <div class="table-wrapper">
+            <table>
+              <tr>
+                <td>Parent/guardian name:</td>
+                <td><input class="table-input" type="text" id="addParentGuardianName"></td>
+              </tr>
+              <tr>
+                <td>Parent/guardian phone:</td>
+                <td><input class="table-input" type="text" id="addParentGuardianPhone"></td>
+              </tr>
+              <tr>
+              <td>Parent/guardian email:</td>
+              <td><input class="table-input" type="text" id="addParentGuardianEmail"></td>
+              </tr>
+            </table>
+          </div>
+          <h3>School/Teacher Information</h3>
+          <div class="table-wrapper">
+            <table>
+              <tr>
+                <td>Current school name:</td>
+                <td><input class="table-input" type="text" id="addCurrentSchoolName"></td>
+              </tr>
+              <tr>
+                <td>Current teacher name:</td>
+                <td><input class="table-input" type="text" id="addCurrentTeacherName"></td>
+              </tr>
+              <tr>
+                <td>Current teacher email:</td>
+                <td><input class="table-input" type="text" id="addCurrentTeacherEmail"></td>
+              </tr>
+            </table>
+          </div>
+          <h3>EEC Information</h3>
+          <div class="table-wrapper">
+            <table>
+              <tr>
+                <td>Enrolled in EEC:</td>
+                <td>
+                  <select class="table-select" id="addEnrolledInEEC">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                  </select>
+                </td>
+              </tr>
+            </table>
+          </div>
+        <div class="modal-htmlbutton">
+          <button id="addStudentModalButton">Add Student</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENAME MODAL -->
+    <div class="modal-html" id="renameStudentModal">
+      <div class="modal-htmlcontent">
+        <div class="modal-htmlheader">
+          <h2>Rename Student
+            <button class="modal-htmlclose"><i class="bi-close bi-x-circle-fill"></i></button>
+          </h2>
+        </div>
+        <div class="modal-htmlbody">
+          <h3 id="currentStudentName"></h3>
+          <label class="block-label" for="renameFirst">New first name:</label>
+          <input class="column-input" style="margin-bottom: 10px;" type="text" id="renameFirst">
+          <label class="block-label" for="renameLast">New last name:</label>
+          <input class="column-input" type="text" id="renameLast">
+          <div class="modal-htmlbutton">
+            <button id="renameStudentModalButton">Rename Student</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- EMAIL MODAL -->
+    <div class="modal-html" id="emailModal">
+      <div class="modal-htmlcontent">
+        <div class="modal-htmlheader">
+          <h2>Compose Email
+            <button class="modal-htmlclose"><i class="bi-close bi-x-circle-fill"></i></button>
+          </h2>
+        </div>
+        <div class="modal-htmlbody">
+          <h3>Templates</h3>
+          <label class="block-label" for="templateSelect">Select template:</label>
+          <select class="column-select" id="templateSelect">
+            <option value="none">None</option>
+            <option value="waitlist">Waitlist</option>
+            <option value="evaluation">Evaluation</option>
+            <option value="screeningEEC">Screening (EEC)</option>
+            <option value="screeningSchool">Screening (School)</option>
+            <option value="acceptance">Acceptance</option>
+            <option value="acceptanceConditional">Acceptance (Conditional)</option>
+            <option value="rejection">Rejection</option>
+            <option value="completion">Completion</option>
+          </select>
+          <div class="warning" id="templateWarning">
+            <i class="bi-exclamation-triangle-fill" style="color: var(--warning-color)"></i>
+            <b>Template data missing!</b>
+          </div>
+          <h3>Compose Email</h3>
+          <label class="block-label" for="emailRecipient">To:</label>
+          <input class="column-input" style="margin-bottom: 10px;" type="text" id="emailRecipient">
+          <label class="block-label" for="emailSubject">Subject:</label>
+          <input class="column-input" style="margin-bottom: 10px;" type="text" id="emailSubject">
+          <div class="label-text">Message:</div>
+          <div class="rich-text-box" contenteditable="true" id="emailBody"></div>
+          <div class="modal-htmlbutton">
+            <button id="sendEmailModalButton">Send Email</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT FORMS MODAL -->
+    <div class="modal-html" id="exportFormsModal">
+      <div class="modal-htmlcontent">
+        <div class="modal-htmlheader">
+          <h2>Export Forms
+            <button class="modal-htmlclose"><i class="bi-close bi-x-circle-fill"></i></button>
+          </h2>
+        </div>
+        <div class="modal-htmlbody">
+          <h3>Form Type</h3>
+          <label class="block-label" for="formSelect">Select form:</label>
+          <select class="column-select" id="formSelect">
+            <option value="Admission Contract">Admission Contract</option>
+            <option value="Tuition Payment Options">Tuition Payment Options</option>
+            <option value="Medical Consent To Treat">Medical Consent To Treat</option>
+            <option value="Student Emergency Contacts">Student Emergency Contacts</option>
+            <option value="Blackbaud Tuition Information">Blackbaud Tuition Information</option>
+          </select>
+          <div class="modal-htmlbutton">
+            <button id="exportFormsModalButton">Download Form</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT DATA MODAL -->
+    <div class="modal-html" id="exportDataModal" >
+      <div class="modal-htmlcontent">
+        <div class="modal-htmlheader">
+          <h2>Export App Data
+            <button class="modal-htmlclose"><i class="bi-close bi-x-circle-fill"></i></button>
+          </h2>
+        </div>
+        <div class="modal-htmlbody">
+          <h3>App Data Type</h3>
+          <label class="block-label" for="dataTypeSelect">Select data:</label>
+          <select class="column-select" id="dataTypeSelect" style="margin-bottom: 0">
+            <option value="activeData">Active enrollment data</option>
+            <option value="archiveData">Archive enrollment data</option>
+          </select>
+          <h3>File Type</h3>
+          <label class="block-label" for="fileTypeSelect">Select file type:</label>
+          <select class="column-select" id="fileTypeSelect" style="margin-bottom: 0">
+            <option value="csv">Comma Separated Values (.csv)</option>
+            <option value="xlsx">Microsoft Excel (.xlsx)</option>
+          </select>
+          <div class="modal-htmlbutton">
+            <button id="exportDataModalButton">Download Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="javascript-code">
+    <?!= include('dashboard.js'); ?>
+  </div>
+
+  <?!= include('falcon-print.lib'); ?>
+</body>
+
+</html>
